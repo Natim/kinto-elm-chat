@@ -9109,198 +9109,6 @@ var _elm_lang$http$Http$StringPart = F2(
 	});
 var _elm_lang$http$Http$stringPart = _elm_lang$http$Http$StringPart;
 
-var _lukewestby$elm_http_builder$HttpBuilder$replace = F2(
-	function (old, $new) {
-		return function (_p0) {
-			return A2(
-				_elm_lang$core$String$join,
-				$new,
-				A2(_elm_lang$core$String$split, old, _p0));
-		};
-	});
-var _lukewestby$elm_http_builder$HttpBuilder$queryEscape = function (_p1) {
-	return A3(
-		_lukewestby$elm_http_builder$HttpBuilder$replace,
-		'%20',
-		'+',
-		_elm_lang$http$Http$encodeUri(_p1));
-};
-var _lukewestby$elm_http_builder$HttpBuilder$queryPair = function (_p2) {
-	var _p3 = _p2;
-	return A2(
-		_elm_lang$core$Basics_ops['++'],
-		_lukewestby$elm_http_builder$HttpBuilder$queryEscape(_p3._0),
-		A2(
-			_elm_lang$core$Basics_ops['++'],
-			'=',
-			_lukewestby$elm_http_builder$HttpBuilder$queryEscape(_p3._1)));
-};
-var _lukewestby$elm_http_builder$HttpBuilder$joinUrlEncoded = function (args) {
-	return A2(
-		_elm_lang$core$String$join,
-		'&',
-		A2(_elm_lang$core$List$map, _lukewestby$elm_http_builder$HttpBuilder$queryPair, args));
-};
-var _lukewestby$elm_http_builder$HttpBuilder$toRequest = function (_p4) {
-	var _p5 = _p4;
-	var _p6 = _p5._0;
-	var encodedParams = _lukewestby$elm_http_builder$HttpBuilder$joinUrlEncoded(_p6.queryParams);
-	var fullUrl = _elm_lang$core$String$isEmpty(encodedParams) ? _p6.url : A2(
-		_elm_lang$core$Basics_ops['++'],
-		_p6.url,
-		A2(_elm_lang$core$Basics_ops['++'], '?', encodedParams));
-	return _elm_lang$http$Http$request(
-		{method: _p6.method, url: fullUrl, headers: _p6.headers, body: _p6.body, expect: _p6.expect, timeout: _p6.timeout, withCredentials: _p6.withCredentials});
-};
-var _lukewestby$elm_http_builder$HttpBuilder$send = F2(
-	function (tagger, builder) {
-		return A2(
-			_elm_lang$http$Http$send,
-			tagger,
-			_lukewestby$elm_http_builder$HttpBuilder$toRequest(builder));
-	});
-var _lukewestby$elm_http_builder$HttpBuilder$RequestDetails = F8(
-	function (a, b, c, d, e, f, g, h) {
-		return {method: a, headers: b, url: c, body: d, expect: e, timeout: f, withCredentials: g, queryParams: h};
-	});
-var _lukewestby$elm_http_builder$HttpBuilder$RequestBuilder = function (a) {
-	return {ctor: 'RequestBuilder', _0: a};
-};
-var _lukewestby$elm_http_builder$HttpBuilder$requestWithMethodAndUrl = F2(
-	function (method, url) {
-		return _lukewestby$elm_http_builder$HttpBuilder$RequestBuilder(
-			{
-				method: method,
-				url: url,
-				headers: {ctor: '[]'},
-				body: _elm_lang$http$Http$emptyBody,
-				expect: _elm_lang$http$Http$expectStringResponse(
-					function (_p7) {
-						return _elm_lang$core$Result$Ok(
-							{ctor: '_Tuple0'});
-					}),
-				timeout: _elm_lang$core$Maybe$Nothing,
-				withCredentials: false,
-				queryParams: {ctor: '[]'}
-			});
-	});
-var _lukewestby$elm_http_builder$HttpBuilder$get = _lukewestby$elm_http_builder$HttpBuilder$requestWithMethodAndUrl('GET');
-var _lukewestby$elm_http_builder$HttpBuilder$post = _lukewestby$elm_http_builder$HttpBuilder$requestWithMethodAndUrl('POST');
-var _lukewestby$elm_http_builder$HttpBuilder$put = _lukewestby$elm_http_builder$HttpBuilder$requestWithMethodAndUrl('PUT');
-var _lukewestby$elm_http_builder$HttpBuilder$patch = _lukewestby$elm_http_builder$HttpBuilder$requestWithMethodAndUrl('PATCH');
-var _lukewestby$elm_http_builder$HttpBuilder$delete = _lukewestby$elm_http_builder$HttpBuilder$requestWithMethodAndUrl('DELETE');
-var _lukewestby$elm_http_builder$HttpBuilder$options = _lukewestby$elm_http_builder$HttpBuilder$requestWithMethodAndUrl('OPTIONS');
-var _lukewestby$elm_http_builder$HttpBuilder$trace = _lukewestby$elm_http_builder$HttpBuilder$requestWithMethodAndUrl('TRACE');
-var _lukewestby$elm_http_builder$HttpBuilder$head = _lukewestby$elm_http_builder$HttpBuilder$requestWithMethodAndUrl('HEAD');
-var _lukewestby$elm_http_builder$HttpBuilder$map = F2(
-	function (fn, _p8) {
-		var _p9 = _p8;
-		return _lukewestby$elm_http_builder$HttpBuilder$RequestBuilder(
-			fn(_p9._0));
-	});
-var _lukewestby$elm_http_builder$HttpBuilder$withHeader = F2(
-	function (key, value) {
-		return _lukewestby$elm_http_builder$HttpBuilder$map(
-			function (details) {
-				return _elm_lang$core$Native_Utils.update(
-					details,
-					{
-						headers: {
-							ctor: '::',
-							_0: A2(_elm_lang$http$Http$header, key, value),
-							_1: details.headers
-						}
-					});
-			});
-	});
-var _lukewestby$elm_http_builder$HttpBuilder$withHeaders = function (headerPairs) {
-	return _lukewestby$elm_http_builder$HttpBuilder$map(
-		function (details) {
-			return _elm_lang$core$Native_Utils.update(
-				details,
-				{
-					headers: A2(
-						_elm_lang$core$Basics_ops['++'],
-						A2(
-							_elm_lang$core$List$map,
-							_elm_lang$core$Basics$uncurry(_elm_lang$http$Http$header),
-							headerPairs),
-						details.headers)
-				});
-		});
-};
-var _lukewestby$elm_http_builder$HttpBuilder$withBody = function (body) {
-	return _lukewestby$elm_http_builder$HttpBuilder$map(
-		function (details) {
-			return _elm_lang$core$Native_Utils.update(
-				details,
-				{body: body});
-		});
-};
-var _lukewestby$elm_http_builder$HttpBuilder$withStringBody = F2(
-	function (contentType, value) {
-		return _lukewestby$elm_http_builder$HttpBuilder$withBody(
-			A2(_elm_lang$http$Http$stringBody, contentType, value));
-	});
-var _lukewestby$elm_http_builder$HttpBuilder$withUrlEncodedBody = function (_p10) {
-	return A2(
-		_lukewestby$elm_http_builder$HttpBuilder$withStringBody,
-		'application/x-www-form-urlencoded',
-		_lukewestby$elm_http_builder$HttpBuilder$joinUrlEncoded(_p10));
-};
-var _lukewestby$elm_http_builder$HttpBuilder$withJsonBody = function (value) {
-	return _lukewestby$elm_http_builder$HttpBuilder$withBody(
-		_elm_lang$http$Http$jsonBody(value));
-};
-var _lukewestby$elm_http_builder$HttpBuilder$withMultipartStringBody = function (partPairs) {
-	return _lukewestby$elm_http_builder$HttpBuilder$map(
-		function (details) {
-			return _elm_lang$core$Native_Utils.update(
-				details,
-				{
-					body: _elm_lang$http$Http$multipartBody(
-						A2(
-							_elm_lang$core$List$map,
-							_elm_lang$core$Basics$uncurry(_elm_lang$http$Http$stringPart),
-							partPairs))
-				});
-		});
-};
-var _lukewestby$elm_http_builder$HttpBuilder$withTimeout = function (timeout) {
-	return _lukewestby$elm_http_builder$HttpBuilder$map(
-		function (details) {
-			return _elm_lang$core$Native_Utils.update(
-				details,
-				{
-					timeout: _elm_lang$core$Maybe$Just(timeout)
-				});
-		});
-};
-var _lukewestby$elm_http_builder$HttpBuilder$withCredentials = _lukewestby$elm_http_builder$HttpBuilder$map(
-	function (details) {
-		return _elm_lang$core$Native_Utils.update(
-			details,
-			{withCredentials: true});
-	});
-var _lukewestby$elm_http_builder$HttpBuilder$withExpect = function (expect) {
-	return _lukewestby$elm_http_builder$HttpBuilder$map(
-		function (details) {
-			return _elm_lang$core$Native_Utils.update(
-				details,
-				{expect: expect});
-		});
-};
-var _lukewestby$elm_http_builder$HttpBuilder$withQueryParams = function (queryParams) {
-	return _lukewestby$elm_http_builder$HttpBuilder$map(
-		function (details) {
-			return _elm_lang$core$Native_Utils.update(
-				details,
-				{
-					queryParams: A2(_elm_lang$core$Basics_ops['++'], details.queryParams, queryParams)
-				});
-		});
-};
-
 var _user$project$Utils$plural = F2(
 	function (unit, amount) {
 		var roundAmount = _elm_lang$core$Basics$round(amount);
@@ -9328,66 +9136,6 @@ var _user$project$Utils$timeAgo = F2(
 		return (_elm_lang$core$Native_Utils.cmp(seconds, 10) < 0) ? 'a few seconds ago' : ((_elm_lang$core$Native_Utils.cmp(seconds, 55) < 0) ? A2(_user$project$Utils$plural, 'second', seconds) : (A3(_user$project$Utils$within, 55, 65, seconds) ? 'about a minute ago' : ((_elm_lang$core$Native_Utils.cmp(minutes, 55) < 0) ? A2(_user$project$Utils$plural, 'minute', minutes) : (A3(_user$project$Utils$within, 55, 65, minutes) ? 'about an hour ago' : ((_elm_lang$core$Native_Utils.cmp(hours, 22) < 0) ? A2(_user$project$Utils$plural, 'hour', hours) : (A3(_user$project$Utils$within, 22, 26, hours) ? 'about a day ago' : (A3(_user$project$Utils$within, 6, 8, days) ? 'about a week ago' : (A3(_user$project$Utils$within, 14, 16, days) ? 'about 2 weeks ago' : (A3(_user$project$Utils$within, 20, 22, days) ? 'about 3 weeks ago' : ((_elm_lang$core$Native_Utils.cmp(days, 27) < 0) ? A2(_user$project$Utils$plural, 'day', days) : (A3(_user$project$Utils$within, 27, 33, days) ? 'about a month ago' : ((_elm_lang$core$Native_Utils.cmp(months, 11) < 0) ? A2(_user$project$Utils$plural, 'month', months) : (A3(_user$project$Utils$within, 11, 13, months) ? 'about a year ago' : A2(_user$project$Utils$plural, 'year', years))))))))))))));
 	});
 
-var _user$project$Main$update = F2(
-	function (msg, model) {
-		var _p0 = msg;
-		switch (_p0.ctor) {
-			case 'InitialList':
-				var _p1 = A2(_elm_lang$core$Debug$log, 'results:', _p0._0);
-				if (_p1.ctor === 'Ok') {
-					return {
-						ctor: '_Tuple2',
-						_0: _elm_lang$core$Native_Utils.update(
-							model,
-							{messages: _p1._0.data}),
-						_1: _elm_lang$core$Platform_Cmd$none
-					};
-				} else {
-					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
-				}
-			case 'NewMessage':
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{
-							messages: A2(
-								_elm_lang$core$Basics_ops['++'],
-								model.messages,
-								{
-									ctor: '::',
-									_0: _p0._0,
-									_1: {ctor: '[]'}
-								})
-						}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
-			case 'NewAuthorName':
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{author: _p0._0}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
-			case 'PrepareMessage':
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{prepareMessage: _p0._0}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
-			default:
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{currentTime: _p0._0}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
-		}
-	});
 var _user$project$Main$querystring = '?_limit=10&_sort=-last_modified';
 var _user$project$Main$uri = 'https://demo-kinto.scalingo.io/v1/buckets/f9aff62e-d2d5-479b-a9c7-37f4baf33d19/collections/chat/records';
 var _user$project$Main$Model = F4(
@@ -9440,6 +9188,9 @@ var _user$project$Main$getData = A2(
 		_elm_lang$http$Http$get,
 		A2(_elm_lang$core$Basics_ops['++'], _user$project$Main$uri, _user$project$Main$querystring),
 		_user$project$Main$listDecoder));
+var _user$project$Main$handleRequestComplete = function (_p0) {
+	return _user$project$Main$getData;
+};
 var _user$project$Main$init = {
 	ctor: '_Tuple2',
 	_0: A4(
@@ -9453,6 +9204,143 @@ var _user$project$Main$init = {
 var _user$project$Main$PrepareMessage = function (a) {
 	return {ctor: 'PrepareMessage', _0: a};
 };
+var _user$project$Main$MessagePosted = function (a) {
+	return {ctor: 'MessagePosted', _0: a};
+};
+var _user$project$Main$sendMessage = F2(
+	function (author, message) {
+		var jsonMessage = _elm_lang$core$Json_Encode$object(
+			{
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'data',
+					_1: _elm_lang$core$Json_Encode$object(
+						{
+							ctor: '::',
+							_0: {
+								ctor: '_Tuple2',
+								_0: 'author',
+								_1: _elm_lang$core$Json_Encode$string(author)
+							},
+							_1: {
+								ctor: '::',
+								_0: {
+									ctor: '_Tuple2',
+									_0: 'message',
+									_1: _elm_lang$core$Json_Encode$string(message)
+								},
+								_1: {ctor: '[]'}
+							}
+						})
+				},
+				_1: {ctor: '[]'}
+			});
+		return A2(
+			_elm_lang$http$Http$send,
+			_user$project$Main$MessagePosted,
+			_elm_lang$http$Http$request(
+				{
+					method: 'POST',
+					headers: {
+						ctor: '::',
+						_0: A2(_elm_lang$http$Http$header, 'Authorization', 'Basic ZHVtbXk6cmVxdWVzdA=='),
+						_1: {
+							ctor: '::',
+							_0: A2(_elm_lang$http$Http$header, 'Content-Type', 'application/json'),
+							_1: {ctor: '[]'}
+						}
+					},
+					url: _user$project$Main$uri,
+					body: _elm_lang$http$Http$jsonBody(jsonMessage),
+					expect: _elm_lang$http$Http$expectStringResponse(
+						function (_p1) {
+							var _p2 = _p1;
+							return _elm_lang$core$Result$Ok(_p2.body);
+						}),
+					timeout: _elm_lang$core$Maybe$Nothing,
+					withCredentials: false
+				}));
+	});
+var _user$project$Main$update = F2(
+	function (msg, model) {
+		var _p3 = msg;
+		switch (_p3.ctor) {
+			case 'InitialList':
+				var _p4 = A2(_elm_lang$core$Debug$log, 'results:', _p3._0);
+				if (_p4.ctor === 'Ok') {
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{messages: _p4._0.data}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
+				} else {
+					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+				}
+			case 'NewMessage':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							messages: A2(
+								_elm_lang$core$Basics_ops['++'],
+								model.messages,
+								{
+									ctor: '::',
+									_0: _p3._0,
+									_1: {ctor: '[]'}
+								})
+						}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'NewAuthorName':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{author: _p3._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'PrepareMessage':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{prepareMessage: _p3._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'SendMessage':
+				return {
+					ctor: '_Tuple2',
+					_0: model,
+					_1: A2(_user$project$Main$sendMessage, model.author, model.prepareMessage)
+				};
+			case 'Tick':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{currentTime: _p3._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			default:
+				if (_p3._0.ctor === 'Ok') {
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{prepareMessage: ''}),
+						_1: _user$project$Main$getData
+					};
+				} else {
+					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+				}
+		}
+	});
+var _user$project$Main$SendMessage = {ctor: 'SendMessage'};
 var _user$project$Main$NewAuthorName = function (a) {
 	return {ctor: 'NewAuthorName', _0: a};
 };
@@ -9683,7 +9571,15 @@ var _user$project$Main$view = function (model) {
 														_1: {
 															ctor: '::',
 															_0: _elm_lang$html$Html_Attributes$id('message'),
-															_1: {ctor: '[]'}
+															_1: {
+																ctor: '::',
+																_0: _elm_lang$html$Html_Events$onInput(_user$project$Main$PrepareMessage),
+																_1: {
+																	ctor: '::',
+																	_0: _elm_lang$html$Html_Attributes$value(model.prepareMessage),
+																	_1: {ctor: '[]'}
+																}
+															}
 														}
 													}
 												},
@@ -9718,8 +9614,12 @@ var _user$project$Main$view = function (model) {
 												_0: _elm_lang$html$Html_Attributes$id('submit'),
 												_1: {
 													ctor: '::',
-													_0: _elm_lang$html$Html_Attributes$class('mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect'),
-													_1: {ctor: '[]'}
+													_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$SendMessage),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$class('mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect'),
+														_1: {ctor: '[]'}
+													}
 												}
 											},
 											{
