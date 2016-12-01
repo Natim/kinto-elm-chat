@@ -14,7 +14,7 @@ import Utils
 
 
 uri =
-    "http://demo-kinto.scalingo.io/v1/buckets/f9aff62e-d2d5-479b-a9c7-37f4baf33d19/collections/chat/records"
+    "https://demo-kinto.scalingo.io/v1/buckets/f9aff62e-d2d5-479b-a9c7-37f4baf33d19/collections/chat/records"
 
 
 querystring =
