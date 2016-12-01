@@ -1,0 +1,59 @@
+html, body {
+  font-family: 'Roboto', 'Helvetica', sans-serif;
+}
+
+main, .app-card {
+  height: 100%;
+  padding-bottom: 0;
+}
+
+.mdl-layout__header-row {
+  padding: 0;
+  margin: 0 auto;
+}
+
+.app-container {
+  height: calc(100% - 150px);
+  padding-bottom: 0;
+}
+
+.app-card {
+  margin: 0 auto;
+  margin-top: 15px;
+}
+
+.mdl-card__supporting-text {
+  height: 100%;
+}
+
+.name {
+    height: 20px;
+    padding: 15px;
+}
+
+#messages {
+  height: calc(100% - 80px);
+  overflow: auto;
+}
+
+.time-ago {
+    padding-left: 10px;
+    display: inline-block;
+    text-align: right;
+    font-size: 0.8em;
+}
+
+#message-form {
+  display: flex;
+  flex-direction: row;
+  float: left;
+}
+
+#message-form .mdl-textfield {
+    width: calc(100% - 100px);
+}
+
+#message-form button {
+  width: 100px;
+  margin: 15px 0 0 10px;
+}
