@@ -4,7 +4,6 @@ import Html
 import Html.Attributes
 import Html.Events
 import Http
-import HttpBuilder
 import Json.Decode exposing (int, string, float, list, Decoder)
 import Json.Encode
 import Json.Decode.Pipeline exposing (decode, required, optional, hardcoded)
@@ -25,7 +24,7 @@ type Msg
     = NewMessage Message
     | NewAuthorName String
     | SendMessage
-    | MessagePosted
+    | MessagePosted (Result Http.Error String)
     | PrepareMessage String
     | InitialList (Result Http.Error Data)
     | Tick Time
@@ -84,11 +83,19 @@ sendMessage author message =
                   )
                 ]
     in
-        HttpBuilder.post uri
-            |> HttpBuilder.withHeader "Authorization" "ZHVtbXk6cmVxdWVzdA=="
-            |> HttpBuilder.withJsonBody jsonMessage
-            |> HttpBuilder.withCredentials
-            |> HttpBuilder.send handleRequestComplete
+        Http.send MessagePosted <|
+            Http.request
+                { method = "POST"
+                , headers =
+                    [ Http.header "Authorization" "Basic ZHVtbXk6cmVxdWVzdA=="
+                    , Http.header "Content-Type" "application/json"
+                    ]
+                , url = uri
+                , body = Http.jsonBody jsonMessage
+                , expect = Http.expectStringResponse (\{ body } -> Ok body)
+                , timeout = Nothing
+                , withCredentials = False
+                }
 
 
 handleRequestComplete : Result Http.Error (List String) -> Cmd Msg
@@ -122,13 +129,16 @@ update msg model =
             ( { model | prepareMessage = message }, Cmd.none )
 
         SendMessage ->
-            ( { model | prepareMessage = "" }, (sendMessage model.author model.prepareMessage) )
+            ( model, (sendMessage model.author model.prepareMessage) )
 
         Tick time ->
             ( { model | currentTime = time }, Cmd.none )
 
-        MessagePosted ->
-            ( model, getData )
+        MessagePosted (Ok deployed) ->
+            ( { model | prepareMessage = "" }, getData )
+
+        MessagePosted (Err error) ->
+            ( model, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
@@ -187,7 +197,6 @@ view model =
             , Html.form
                 [ Html.Attributes.id "message-form"
                 , Html.Attributes.action "#"
-                , Html.Events.onSubmit SendMessage
                 ]
                 [ Html.div
                     [ Html.Attributes.class "mdl-textfield mdl-js-textfield mdl-textfield--floating-label"
@@ -196,6 +205,8 @@ view model =
                         [ Html.Attributes.class "mdl-textfield__input"
                         , Html.Attributes.type_ "text"
                         , Html.Attributes.id "message"
+                        , Html.Events.onInput PrepareMessage
+                        , Html.Attributes.value model.prepareMessage
                         ]
                         []
                     , Html.label
