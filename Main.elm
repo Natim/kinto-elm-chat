@@ -24,6 +24,8 @@ querystring =
 type Msg
     = NewMessage Message
     | NewAuthorName String
+    | SendMessage
+    | MessagePosted
     | PrepareMessage String
     | InitialList (Result Http.Error Data)
     | Tick Time
@@ -69,6 +71,31 @@ modelDecoder =
         |> required "last_modified" float
 
 
+sendMessage : String -> String -> Cmd Msg
+sendMessage author message =
+    let
+        jsonMessage =
+            Json.Encode.object
+                [ ( "data"
+                  , Json.Encode.object
+                        [ ( "author", Json.Encode.string author )
+                        , ( "message", Json.Encode.string message )
+                        ]
+                  )
+                ]
+    in
+        HttpBuilder.post uri
+            |> HttpBuilder.withHeader "Authorization" "ZHVtbXk6cmVxdWVzdA=="
+            |> HttpBuilder.withJsonBody jsonMessage
+            |> HttpBuilder.withCredentials
+            |> HttpBuilder.send handleRequestComplete
+
+
+handleRequestComplete : Result Http.Error (List String) -> Cmd Msg
+handleRequestComplete _ =
+    getData
+
+
 init : ( Model, Cmd Msg )
 init =
     ( Model "Guest" [] "" 0, getData )
@@ -94,8 +121,14 @@ update msg model =
         PrepareMessage message ->
             ( { model | prepareMessage = message }, Cmd.none )
 
+        SendMessage ->
+            ( { model | prepareMessage = "" }, (sendMessage model.author model.prepareMessage) )
+
         Tick time ->
             ( { model | currentTime = time }, Cmd.none )
+
+        MessagePosted ->
+            ( model, getData )
 
 
 subscriptions : Model -> Sub Msg
@@ -154,6 +187,7 @@ view model =
             , Html.form
                 [ Html.Attributes.id "message-form"
                 , Html.Attributes.action "#"
+                , Html.Events.onSubmit SendMessage
                 ]
                 [ Html.div
                     [ Html.Attributes.class "mdl-textfield mdl-js-textfield mdl-textfield--floating-label"
@@ -172,6 +206,7 @@ view model =
                     ]
                 , Html.button
                     [ Html.Attributes.id "submit"
+                    , Html.Events.onClick SendMessage
                     , Html.Attributes.class "mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
                     ]
                     [ Html.text "Send" ]
