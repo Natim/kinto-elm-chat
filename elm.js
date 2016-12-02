@@ -9137,7 +9137,26 @@ var _user$project$Utils$timeAgo = F2(
 	});
 
 var _user$project$Main$querystring = '?_limit=10&_sort=-last_modified';
-var _user$project$Main$uri = 'https://demo-kinto.scalingo.io/v1/buckets/f9aff62e-d2d5-479b-a9c7-37f4baf33d19/collections/chat/records';
+var _user$project$Main$uri = 'https://kinto.ticabri.com/v1/buckets/kintochat/collections/4815162342/records';
+var _user$project$Main$newMessage = _elm_lang$core$Native_Platform.incomingPort(
+	'newMessage',
+	A2(
+		_elm_lang$core$Json_Decode$andThen,
+		function (author) {
+			return A2(
+				_elm_lang$core$Json_Decode$andThen,
+				function (message) {
+					return A2(
+						_elm_lang$core$Json_Decode$andThen,
+						function (last_modified) {
+							return _elm_lang$core$Json_Decode$succeed(
+								{author: author, message: message, last_modified: last_modified});
+						},
+						A2(_elm_lang$core$Json_Decode$field, 'last_modified', _elm_lang$core$Json_Decode$float));
+				},
+				A2(_elm_lang$core$Json_Decode$field, 'message', _elm_lang$core$Json_Decode$string));
+		},
+		A2(_elm_lang$core$Json_Decode$field, 'author', _elm_lang$core$Json_Decode$string)));
 var _user$project$Main$Model = F4(
 	function (a, b, c, d) {
 		return {author: a, messages: b, prepareMessage: c, currentTime: d};
@@ -9169,14 +9188,6 @@ var _user$project$Main$listDecoder = A3(
 	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_user$project$Main$Data));
 var _user$project$Main$Tick = function (a) {
 	return {ctor: 'Tick', _0: a};
-};
-var _user$project$Main$subscriptions = function (model) {
-	return _elm_lang$core$Platform_Sub$batch(
-		{
-			ctor: '::',
-			_0: A2(_elm_lang$core$Time$every, _elm_lang$core$Time$second, _user$project$Main$Tick),
-			_1: {ctor: '[]'}
-		});
 };
 var _user$project$Main$InitialList = function (a) {
 	return {ctor: 'InitialList', _0: a};
@@ -9273,7 +9284,9 @@ var _user$project$Main$update = F2(
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
 							model,
-							{messages: _p4._0.data}),
+							{
+								messages: _elm_lang$core$List$reverse(_p4._0.data)
+							}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				} else {
@@ -9637,11 +9650,23 @@ var _user$project$Main$view = function (model) {
 			}
 		});
 };
-var _user$project$Main$main = _elm_lang$html$Html$program(
-	{init: _user$project$Main$init, update: _user$project$Main$update, view: _user$project$Main$view, subscriptions: _user$project$Main$subscriptions})();
 var _user$project$Main$NewMessage = function (a) {
 	return {ctor: 'NewMessage', _0: a};
 };
+var _user$project$Main$subscriptions = function (model) {
+	return _elm_lang$core$Platform_Sub$batch(
+		{
+			ctor: '::',
+			_0: A2(_elm_lang$core$Time$every, _elm_lang$core$Time$second, _user$project$Main$Tick),
+			_1: {
+				ctor: '::',
+				_0: _user$project$Main$newMessage(_user$project$Main$NewMessage),
+				_1: {ctor: '[]'}
+			}
+		});
+};
+var _user$project$Main$main = _elm_lang$html$Html$program(
+	{init: _user$project$Main$init, update: _user$project$Main$update, view: _user$project$Main$view, subscriptions: _user$project$Main$subscriptions})();
 
 var Elm = {};
 Elm['Main'] = Elm['Main'] || {};

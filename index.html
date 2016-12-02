@@ -25,7 +25,49 @@
                 </div>
             </main>
         </div>
+        <script src="//js.pusher.com/3.2/pusher.min.js"></script>
         <script src="elm.js"></script>
-        <script>Elm.Main.embed(document.getElementById("elm"));</script>
+        <script>
+            var scrolled = false;
+
+            var app = Elm.Main.embed(document.getElementById("elm"));
+            var pusher = new Pusher('12c789964f052a8c2e77', {
+              encrypted: true
+            });
+
+            var channelName = 'kintochat-4815162342-record';
+            var channel = pusher.subscribe(channelName);
+
+            channel.bind('create', function(data) {
+              scrolled = false;
+              var notif = data[0].new;
+              var message = {
+                author: notif.author,
+                message: notif.message,
+                last_modified: notif.last_modified
+              };
+              app.ports.newMessage.send(message);
+            });
+        </script>
+
+        <script src="static/jquery.js"></script>
+
+        <script type="text/javascript">
+            $(document).ready(function() {
+              $("#message").focus();
+
+              function updateScroll(){
+                  if (!scrolled && $('#messages').html() !== undefined) {
+                      $('#messages').scrollTop($('#messages')[0].scrollHeight);
+                  }
+              }
+
+            $("#messages").on('scroll', function(){
+                scrolled = true;
+            });
+              setInterval(updateScroll, 1000);
+            });
+        </script>
+
     </body>
 </html>
