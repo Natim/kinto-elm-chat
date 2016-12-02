@@ -9409,7 +9409,11 @@ var _user$project$Main$view = function (model) {
 												_1: {
 													ctor: '::',
 													_0: _elm_lang$html$Html_Attributes$value(model.author),
-													_1: {ctor: '[]'}
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$tabindex(1),
+														_1: {ctor: '[]'}
+													}
 												}
 											}
 										},
@@ -9590,7 +9594,11 @@ var _user$project$Main$view = function (model) {
 																_1: {
 																	ctor: '::',
 																	_0: _elm_lang$html$Html_Attributes$value(model.prepareMessage),
-																	_1: {ctor: '[]'}
+																	_1: {
+																		ctor: '::',
+																		_0: _elm_lang$html$Html_Attributes$tabindex(2),
+																		_1: {ctor: '[]'}
+																	}
 																}
 															}
 														}
@@ -9631,7 +9639,11 @@ var _user$project$Main$view = function (model) {
 													_1: {
 														ctor: '::',
 														_0: _elm_lang$html$Html_Attributes$class('mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect'),
-														_1: {ctor: '[]'}
+														_1: {
+															ctor: '::',
+															_0: _elm_lang$html$Html_Attributes$tabindex(3),
+															_1: {ctor: '[]'}
+														}
 													}
 												}
 											},
