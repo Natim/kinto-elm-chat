@@ -161,6 +161,7 @@ view model =
                         [ Html.Attributes.class "mdl-textfield__input"
                         , Html.Events.onInput NewAuthorName
                         , Html.Attributes.value model.author
+                        , Html.Attributes.tabindex 1
                         ]
                         []
                     , Html.label
@@ -208,6 +209,7 @@ view model =
                         , Html.Attributes.id "message"
                         , Html.Events.onInput PrepareMessage
                         , Html.Attributes.value model.prepareMessage
+                        , Html.Attributes.tabindex 2
                         ]
                         []
                     , Html.label
@@ -220,6 +222,7 @@ view model =
                     [ Html.Attributes.id "submit"
                     , Html.Events.onClick SendMessage
                     , Html.Attributes.class "mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
+                    , Html.Attributes.tabindex 3
                     ]
                     [ Html.text "Send" ]
                 ]
