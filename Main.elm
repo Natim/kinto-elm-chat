@@ -13,14 +13,6 @@ import Time exposing (Time, second)
 import Utils
 
 
-uri =
-    "https://kinto.ticabri.com/v1/buckets/kintochat/collections/4815162342/records"
-
-
-querystring =
-    "?_limit=10&_sort=-last_modified"
-
-
 client : Kinto.Client
 client =
     Kinto.client
