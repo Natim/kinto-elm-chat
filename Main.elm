@@ -7,6 +7,7 @@ import Http
 import Json.Decode exposing (int, string, float, list, Decoder, decodeString)
 import Json.Encode
 import Json.Decode.Pipeline exposing (decode, required, optional, hardcoded)
+import Kinto
 import Task
 import Time exposing (Time, second)
 import Utils
@@ -20,13 +21,25 @@ querystring =
     "?_limit=10&_sort=-last_modified"
 
 
+client : Kinto.Client
+client =
+    Kinto.client
+        "https://kinto.ticabri.com/v1/"
+        (Kinto.Basic "random" "user")
+
+
+recordResource : Kinto.Resource Message
+recordResource =
+    Kinto.recordResource "kintochat" "4815162342" modelDecoder
+
+
 type Msg
     = NewMessage Message
     | NewAuthorName String
     | SendMessage
-    | MessagePosted (Result Http.Error String)
+    | MessagePosted (Result Kinto.Error Message)
     | PrepareMessage String
-    | InitialList (Result Http.Error Data)
+    | InitialList (Result Kinto.Error (List Message))
     | Tick Time
 
 
@@ -35,11 +48,7 @@ type alias Model =
     , messages : List Message
     , prepareMessage : String
     , currentTime : Time
-    }
-
-
-type alias Data =
-    { data : List Message
+    , error : Maybe String
     }
 
 
@@ -52,14 +61,10 @@ type alias Message =
 
 getData : Cmd Msg
 getData =
-    Http.send InitialList <|
-        Http.get (uri ++ querystring) listDecoder
-
-
-listDecoder : Decoder Data
-listDecoder =
-    decode Data
-        |> required "data" (list modelDecoder)
+    client
+        |> Kinto.getList recordResource
+        |> Kinto.sortBy [ "-last_modified" ]
+        |> Kinto.send InitialList
 
 
 modelDecoder : Decoder Message
@@ -75,49 +80,28 @@ sendMessage author message =
     let
         jsonMessage =
             Json.Encode.object
-                [ ( "data"
-                  , Json.Encode.object
-                        [ ( "author", Json.Encode.string author )
-                        , ( "message", Json.Encode.string message )
-                        ]
-                  )
+                [ ( "author", Json.Encode.string author )
+                , ( "message", Json.Encode.string message )
                 ]
     in
-        Http.send MessagePosted <|
-            Http.request
-                { method = "POST"
-                , headers =
-                    [ Http.header "Authorization" "Basic ZHVtbXk6cmVxdWVzdA=="
-                    , Http.header "Content-Type" "application/json"
-                    ]
-                , url = uri
-                , body = Http.jsonBody jsonMessage
-                , expect = Http.expectStringResponse (\{ body } -> Ok body)
-                , timeout = Nothing
-                , withCredentials = False
-                }
-
-
-handleRequestComplete : Result Http.Error (List String) -> Cmd Msg
-handleRequestComplete _ =
-    getData
+        client
+            |> Kinto.create recordResource jsonMessage
+            |> Kinto.send MessagePosted
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( Model "Guest" [] "" 0, getData )
+    ( Model "Guest" [] "" 0 Nothing, getData )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        InitialList results ->
-            case (Debug.log "results:" results) of
-                Ok new ->
-                    ( { model | messages = (List.reverse new.data) }, Cmd.none )
+        InitialList (Ok messages) ->
+            ( { model | error = Nothing, messages = (List.reverse messages) }, Cmd.none )
 
-                Err _ ->
-                    ( model, Cmd.none )
+        InitialList (Err error) ->
+            { model | error = Just <| toString error } ! []
 
         NewMessage message ->
             ( { model | messages = (model.messages ++ [ message ]) }, Cmd.none )
@@ -134,11 +118,11 @@ update msg model =
         Tick time ->
             ( { model | currentTime = time }, Cmd.none )
 
-        MessagePosted (Ok deployed) ->
-            ( { model | prepareMessage = "" }, getData )
+        MessagePosted (Ok message) ->
+            ( { model | error = Nothing, prepareMessage = "" }, getData )
 
         MessagePosted (Err error) ->
-            ( model, Cmd.none )
+            ( { model | error = Just <| toString error }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
