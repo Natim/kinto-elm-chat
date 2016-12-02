@@ -10179,8 +10179,6 @@ var _user$project$Main$client = A2(
 	_Kinto$elm_kinto$Kinto$client,
 	'https://kinto.ticabri.com/v1/',
 	A2(_Kinto$elm_kinto$Kinto$Basic, 'random', 'user'));
-var _user$project$Main$querystring = '?_limit=10&_sort=-last_modified';
-var _user$project$Main$uri = 'https://kinto.ticabri.com/v1/buckets/kintochat/collections/4815162342/records';
 var _user$project$Main$newMessage = _elm_lang$core$Native_Platform.incomingPort(
 	'newMessage',
 	A2(
