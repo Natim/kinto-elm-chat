@@ -1,10 +1,10 @@
-module Main exposing (..)
+port module Main exposing (..)
 
 import Html
 import Html.Attributes
 import Html.Events
 import Http
-import Json.Decode exposing (int, string, float, list, Decoder)
+import Json.Decode exposing (int, string, float, list, Decoder, decodeString)
 import Json.Encode
 import Json.Decode.Pipeline exposing (decode, required, optional, hardcoded)
 import Task
@@ -13,7 +13,7 @@ import Utils
 
 
 uri =
-    "http://demo-kinto.scalingo.io/v1/buckets/f9aff62e-d2d5-479b-a9c7-37f4baf33d19/collections/chat/records"
+    "https://kinto.ticabri.com/v1/buckets/kintochat/collections/4815162342/records"
 
 
 querystring =
@@ -114,7 +114,7 @@ update msg model =
         InitialList results ->
             case (Debug.log "results:" results) of
                 Ok new ->
-                    ( { model | messages = new.data }, Cmd.none )
+                    ( { model | messages = (List.reverse new.data) }, Cmd.none )
 
                 Err _ ->
                     ( model, Cmd.none )
@@ -145,6 +145,7 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
         [ Time.every second Tick
+        , newMessage NewMessage
         ]
 
 
@@ -234,3 +235,10 @@ main =
         , view = view
         , subscriptions = subscriptions
         }
+
+
+
+-- ports
+
+
+port newMessage : (Message -> msg) -> Sub msg
